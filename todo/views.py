@@ -1,7 +1,7 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.http import JsonResponse
-import json
+
 from django.views.decorators.csrf import csrf_exempt
 
 from .forms import TodoForm
@@ -20,25 +20,34 @@ def index(request):
     page = {
         "forms": form,
         "list": item_list,
-        "title": "TODO LIST",
+        "title": "Trellado",
     }
     return render(request, 'todo/index.html', page)
 
-def remove(request, item_id):
-    item = Todo.objects.get(id=item_id)
+def remove(request, id):
+    item = Todo.objects.get(id=id)
     item.delete()
     messages.info(request, "Task Removed!")
     return redirect('todo')
 
-def update_card(request):
-    if request.method == "POST":
-        data = json.loads(request.body)
-        card_id = data.get("card_id")
-        new_column = data.get("new_column")
+def create(request):
+    if request.method == 'POST':
+        form = TodoForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('todo')
+    else:
+        form = TodoForm()
+    return render(request, 'todo/criar.html', {'form': form})
 
-        # Aqui você atualiza no banco
-        card = Todo.objects.get(id=card_id)
-        card.column = new_column
-        card.save()
-
-        return JsonResponse({"status": "ok"})
+def editar(request, id):
+    todo = get_object_or_404(Todo, id=id)
+    if request.method == 'POST':
+        form = TodoForm(request.POST, instance=todo)
+        if form.is_valid():
+            form.save()
+            return redirect('todo')
+    else:
+        form = TodoForm(instance=todo)
+    return render(request, 'todo/editar.html', {'form': form})
+    

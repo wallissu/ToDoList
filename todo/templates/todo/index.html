@@ -25,44 +25,54 @@
   {% endif %}
 
   <center class="row">
-    <h1><i>To Do List</i></h1>
+    <h1><i>Trellado</i></h1>
+    <form action="/criar" method="GET" style=" padding-right: 4%; padding-bottom: 3%;">
+          {% csrf_token %}
+          <button value="create" type="submit"  class="btn btn-primary" style="float: right;"><span class="glyphicon glyphicon-edit"></span> &nbsp; Criar Card</button>
+        </form>
     <hr />
   </center>
 
+      
+  {% for item in list %}
   
-  <div class="row">
-  
+    <div class="card" draggable="true" ondragstart="drag(event)" id="card{{ item.id }}">
+      <center><b>{{ item.title }}</b></center>
+      <hr>
+      Criada em: {{ item.date|date:"d/m/Y H:i" }}<br>
+      Vencimento: {{ item.duedate|date:"d/m/Y" }}<br>
+      Status:
+      {% if item.duedate < today %}
+        <span style="color:red">Atrasada</span>
+      {% else %}
+        <span style="color:green">No prazo</span>
+      {% endif %}
+      <hr>
+      {{ item.details }}
+      <br><br>
 
-    <div class="col-md-8">
+      <div style="display: flex; justify-content: space-between; gap: 10px; padding-bottom: 3%;">
+        <form action="{% url 'editar' item.id %}" method="GET">
+          <button type="submit" class="btn btn-primary">
+            <span class="glyphicon glyphicon-edit"></span> &nbsp; Edit
+          </button>
+        </form>
 
-      {% for i in list %}
-      <div class="card">
-        <center><b>{{i.title}}</b></center>
-        <hr>
-        {{i.date}}
-        <hr/>
-        {{i.details}}
-        <br />
-        <br />
-        <form action="/del/{{i.id}}" method="POST" style=" padding-right: 4%; padding-bottom: 3%;">
+        <form action="{% url 'del' item.id %}" method="POST">
           {% csrf_token %}
-          <button value="remove" type="submit"  class="btn btn-primary" style="float: right;"><span class="glyphicon glyphicon-trash"></span> &nbsp; Remove</button>
+          <button type="submit" class="btn btn-danger">
+            <span class="glyphicon glyphicon-trash"></span> &nbsp; Remove
+          </button>
         </form>
       </div>
-      {% endfor%}
     </div>
-    <div class="col-md-1"> </div>
-    <div class="col-md-3" >
-      <div  class="submit_form">
-      <form  method="POST">
-        {% csrf_token %}
-        {{forms}}
-        <center>
-        <input type="submit" class="btn btn-default" value="submit" />
-      </center>
-      </form>
+  
+{% endfor %}
+
+      
     </div>
-  </div>
+ 
+ 
 </div>
 </body>
 

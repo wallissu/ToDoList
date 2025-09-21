@@ -1,11 +1,42 @@
+/* General Styles */
+
+body {
+  font-style: Arial;
+  background: #ffffff;
+  margin: 0;
+  padding: 3px;
+  height: 100vh;
+}
+
+.board {
+  display: flex;
+  gap: 20px;
+}
+
+.column {
+  width: 100%;
+  min-height: 100%;
+  padding: 0.3%;
+  border-radius: 30px;
+  background: #f8f8f8;
+  display: block;
+  flex-direction: column; /* garante que os cards fiquem embaixo do outro */
+  gap: 10px;
+}
+
 .card {
- margin-bottom: 5px;
- width: 420px;
- height: 300px;
+ margin-bottom: 10px;
+ padding: 0.3%;
+ min-width: 200px;
+ max-width: 500px;
+ min-height: 100px;
+ max-height: 300px;
  border-radius: 30px;
  background: #e0e0e0;
  box-shadow: 20px 20px 60px #bebebe,
                -20px -20px 60px #ffffff;
+  overflow:auto;
+  cursor: grab;
 }
 
 .card:active {
@@ -17,20 +48,12 @@
   }
 
   .submit_form{
-
     text-align: center;
     padding: 3%;
-    background: pink;
-    border-radius: 25px;
+    background: #e0e0e0;
+    width: 420px;
+    height: 250px;
+    border-radius: 30px;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.4),
                 0 6px 20px 0 rgba(0,0,0,0.36);
   }
-
-.column {
-  min-height: 300px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 10px;
-  background-color: #fafafa;
-
-}
