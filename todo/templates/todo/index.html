@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-
 <head>
-
   <meta charset="utf-8">
   <title>{{title}}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,70 +8,200 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <link rel="stylesheet" type='text/css' href="../../static/style.css">
-  
-
 </head>
 
-<body  class="container-fluid">
-
-  {% if messages %}
-  {% for message in messages %}
-  <div class="alert alert-info">
-    <strong>{{message}}</strong>
+<body>
+  <!-- Mensagens -->
+  <div>
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-info">
+      <strong>{{message}}</strong>
+    </div>
+    {% endfor %}
+    {% endif %}
   </div>
-  {% endfor %}
-  {% endif %}
 
+  <!-- Cabeçalho -->
   <center class="row">
     <h1><i>Trellado</i></h1>
-    <form action="/criar" method="GET" style=" padding-right: 4%; padding-bottom: 3%;">
-          {% csrf_token %}
-          <button value="create" type="submit"  class="btn btn-primary" style="float: right;"><span class="glyphicon glyphicon-edit"></span> &nbsp; Criar Card</button>
-        </form>
-    <hr />
+    <form action="/create_card" method="GET" style="padding-bottom: 20px;">
+      <button value="create" type="submit" class="btn btn-primary">
+        <span class="glyphicon glyphicon-plus"></span> &nbsp; Create Card
+      </button>
+    </form>
+    <hr/>
   </center>
 
-      
-  {% for item in list %}
-  
-    <div class="card" draggable="true" ondragstart="drag(event)" id="card{{ item.id }}">
-      <center><b>{{ item.title }}</b></center>
-      <hr>
-      Criada em: {{ item.date|date:"d/m/Y H:i" }}<br>
-      Vencimento: {{ item.duedate|date:"d/m/Y" }}<br>
-      Status:
-      {% if item.duedate < today %}
-        <span style="color:red">Atrasada</span>
-      {% else %}
-        <span style="color:green">No prazo</span>
-      {% endif %}
-      <hr>
-      {{ item.details }}
-      <br><br>
+  <!-- COLUNAS -->
+  <div class="container">
+    {% for chave_column, dados_column in columns.items %}
+    <div class="column" data-column="{{ chave_column }}">
+      <h3>{{ dados_column.name }}</h3>
+      <div class="cards-container">
+        {% for card in dados_column.cards %}
+        <div class="card" draggable="true" data-card-id="{{ card.id }}">
+          <b>{{ card.title }}</b>
+          <hr style="margin: 8px 0;">
+          
+          <div style="font-size: 12px; color: #666;">
+            <div>📅 Created: {{ card.created_in|date:"d/m/Y" }}</div>
+            {% if card.due_date %}
+            <div>⏰ Due Date: {{ card.due_date|date:"d/m/Y" }}</div>
+            <div>Status: 
+              {% if card.due_date < today %}
+                <span style="color:red">⚠️ Late</span>
+              {% else %}
+                <span style="color:green">✅ On Time</span>
+              {% endif %}
+            </div>
+            {% else %}
+            <div>⏰ Due Date: <span style="color: #999;">No due date</span></div>
+            {% endif %}
+          </div>
+          
+          <hr style="margin: 8px 0;">
+          <p style="font-size: 14px; margin: 0;">{{ card.details|truncatewords:15 }}</p>
 
-      <div style="display: flex; justify-content: space-between; gap: 10px; padding-bottom: 3%;">
-        <form action="{% url 'editar' item.id %}" method="GET">
-          <button type="submit" class="btn btn-primary">
-            <span class="glyphicon glyphicon-edit"></span> &nbsp; Edit
-          </button>
-        </form>
+          <div style="display: flex; justify-content: space-between; gap: 5px; margin-top: 10px;">
+            <form action="{% url 'edit_card' card.id %}" method="GET" style="margin: 0; flex: 1;">
+              <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">
+                <span class="glyphicon glyphicon-edit"></span> Edit
+              </button>
+            </form>
 
-        <form action="{% url 'del' item.id %}" method="POST">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-danger">
-            <span class="glyphicon glyphicon-trash"></span> &nbsp; Remove
-          </button>
-        </form>
+            <form action="{% url 'del' card.id %}" method="POST" style="margin: 0; flex: 1;">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger btn-sm" style="width: 100%;">
+                <span class="glyphicon glyphicon-trash"></span> Delete
+              </button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
       </div>
     </div>
-  
-{% endfor %}
+    {% endfor %}
+  </div>
 
-      
-    </div>
- 
- 
-</div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.card');
+        const columns = document.querySelectorAll('.column');
+        let draggedCard = null;
+        
+        // DRAG START - Quando começa a arrastar
+        cards.forEach(card => {
+            card.addEventListener('dragstart', function(e) {
+                draggedCard = this;
+                this.classList.add('dragging');
+                e.dataTransfer.setData('text/plain', this.dataset.cardId);
+            });
+            
+            card.addEventListener('dragend', function() {
+                this.classList.remove('dragging');
+                columns.forEach(col => col.classList.remove('drop-zone'));
+            });
+        });
+        
+        // DRAG OVER - Quando está sobre uma coluna
+        columns.forEach(column => {
+            column.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('drop-zone');
+            });
+            
+            column.addEventListener('dragleave', function() {
+                this.classList.remove('drop-zone');
+            });
+            
+            // DROP - Quando solta o card
+            column.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('drop-zone');
+                
+                if (draggedCard) {
+                    const cardId = draggedCard.dataset.cardId;
+                    const destinationColumn = this;
+                    const destinationColumnName = destinationColumn.dataset.column;
+                    const container = destinationColumn.querySelector('.cards-container');
+                    
+                    // CALCULAR POSIÇÃO baseada na coordenada Y
+                    const visiblesCards = container.querySelectorAll('.card:not(.dragging)');
+                    const containerRect = container.getBoundingClientRect();
+                    const mouseY = e.clientY - containerRect.top;
+                    
+                    let newPosition = visiblesCards.length; // Posição padrão: final
+                    
+                    // Encontrar entre quais cards soltou
+                    for (let i = 0; i < visiblesCards.length; i++) {
+                        const cardRect = visiblesCards[i].getBoundingClientRect();
+                        const cardMiddleY = cardRect.top - containerRect.top + (cardRect.height / 2);
+                        
+                        if (mouseY < cardMiddleY) {
+                            newPosition = i;
+                            break;
+                        }
+                    }
+                    
+                    // MOVER VISUALMENTE para a nova posição
+                    if (newPosition >= visiblesCards.length) {
+                        container.appendChild(draggedCard);
+                    } else {
+                        container.insertBefore(draggedCard, visiblesCards[newPosition]);
+                    }
+                    
+                    // SALVAR NO BANCO
+                    updateDBposition(cardId, destinationColumnName, newPosition);
+                }
+            });
+        });
+        
+        // FUNÇÃO PARA SALVAR NO BANCO
+        function updateDBposition(cardId, column, position) {
+            fetch('/update_position/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    card_id: cardId,
+                    column: column,
+                    position: position
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status !== 'success') {
+                    console.error('Erro:', data.message);
+                    alert('Erro ao salvar posição. Recarregando...');
+                    setTimeout(() => location.reload(), 1000);
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro de conexão. Recarregando...');
+                setTimeout(() => location.reload(), 1000);
+            });
+        }
+        
+        // PEGAR TOKEN CSRF
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+  </script>
 </body>
-
 </html>

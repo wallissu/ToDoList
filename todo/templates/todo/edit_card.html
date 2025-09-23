@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <link rel="stylesheet" type='text/css' href="../../static/style.css">
+</head>
+<body>
+    <center class="row">
+    <h1><i>Edit Card</i></h1>
+    <hr>
+  </center>
+  <center><div  class="submit_form">
+      <form  method="POST">
+        {% csrf_token %}
+        {{ form }}
+        <center>
+        <input type="submit" class="btn btn-default" value="submit" />
+      </center>
+      </form>
+      <br>
+      <center><a href="{% url 'todo' %}">Back</a></center>
+    </div>
+    
+</center>
+    
+</body>
+</html>

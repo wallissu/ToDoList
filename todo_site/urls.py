@@ -22,7 +22,7 @@ urlpatterns = [
     path('', views.index, name="todo"),
     path('del/<str:id>', views.remove, name="del"),
     path('admin/', admin.site.urls),
-    path('editar/<int:id>/', views.editar, name='editar'),
-    path('criar/', views.create, name='criar'),
-    
+    path('edit_card/<int:id>/', views.edit_card, name='edit_card'),
+    path('create_card/', views.create, name='create_card'),
+    path('update_position/', views.update_card_position, name='update_position')
 ]
