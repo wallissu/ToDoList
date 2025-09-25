@@ -115,6 +115,9 @@ USE_L10N = False
 
 USE_TZ = True
 
+LOGIN_REDIRECT_URL = 'todo'
+LOGOUT_REDIRECT_URL = 'login'
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/

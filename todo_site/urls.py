@@ -24,5 +24,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('edit_card/<int:id>/', views.edit_card, name='edit_card'),
     path('create_card/', views.create, name='create_card'),
-    path('update_position/', views.update_card_position, name='update_position')
+    path('update_position/', views.update_card_position, name='update_position'),
+    path('register/', views.register, name='register'),
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
+    path('profile/', views.profile, name='profile'),
+     
 ]

@@ -1,14 +1,15 @@
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
-
 
 class Todo(models.Model):
     title = models.CharField(max_length=100)
     details = models.TextField()
     created_in = models.DateTimeField(default=timezone.now)
     due_date = models.DateField(null=True, blank=True)
-    column = models.CharField(max_length=50, default='column1')  # coluna1, coluna2, etc.
-    position = models.IntegerField(default=0)  # Ordem dentro da coluna
+    column = models.CharField(max_length=50, default='column1')
+    position = models.IntegerField(default=0)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # Link to user
     
     class Meta:
         ordering = ['column', 'position']
@@ -20,3 +21,7 @@ class Todo(models.Model):
 
     def __str__(self):
         return self.title
+    
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    bio = models.TextField(blank=True)
