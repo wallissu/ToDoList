@@ -7,6 +7,7 @@ db.sqlite3
 media
 migrations
 
+
 # Backup files # 
 *.bak 
 
@@ -137,3 +138,4 @@ GitHub.sublime-settings
 !.vscode/launch.json 
 !.vscode/extensions.json 
 .history
+*.sqlite3
