@@ -1,0 +1,20 @@
+{% extends "todo/base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<center>
+    <div class="submit_form">
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <center>
+                <input type="submit" class="btn btn-primary" value="Submit" />
+            </center>
+        </form>
+        <br>
+        <center><a href="{% url 'todo' %}" class="btn btn-default">Back to Board</a></center>
+    </div>
+</center>
+{% endblock %}

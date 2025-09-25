@@ -1,113 +1,72 @@
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-<head>
-  <meta charset="utf-8">
-  <title>{{title}}</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  <link rel="stylesheet" type='text/css' href="../../static/style.css">
-</head>
+{% extends "todo/base.html" %}
+{% load static %}
 
-<body>
-  <!-- Mensagens -->
-  <div>
-    {% if messages %}
-    {% for message in messages %}
-    <div class="alert alert-info">
-      <strong>{{message}}</strong>
-    </div>
-    {% endfor %}
-    {% endif %}
-  </div>
+{% block title %}Trellado{% endblock %}
+{% block page_title %}Trellado{% endblock %}
 
-<!-- Cabeçalho -->
-<center class="row">
-    <h1><i>Trellado</i></h1>
-    
-    <!-- User info -->
-    {% if user.is_authenticated %}
-    <div style="margin-bottom: 15px;">
-        <span>Welcome, <strong>{{ user.username }}</strong>!</span>
-        <a href="{% url 'profile' %}" class="btn btn-info btn-sm" style="margin-left: 10px;">
-            <span class="glyphicon glyphicon-user"></span> Profile
-        </a>
-        <form action="{% url 'logout' %}" method="POST" style="display: inline; margin-left: 10px;">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-warning btn-sm">
-                <span class="glyphicon glyphicon-log-out"></span> Logout
-            </button>
-        </form>
-    </div>
-    
-    <form action="/create_card" method="GET" style="padding-bottom: 20px;">
-        <button value="create" type="submit" class="btn btn-primary">
-            <span class="glyphicon glyphicon-plus"></span> &nbsp; Create Card
-        </button>
-    </form>
-    {% else %}
-    <div style="margin-bottom: 15px; padding-bottom: 20px;">
-        <p>Please log in to manage your cards</p>
-        <a href="{% url 'login' %}" class="btn btn-primary btn-sm">Login</a>
-        <a href="{% url 'register' %}" class="btn btn-success btn-sm">Register</a>
-    </div>
-    {% endif %}
-    
-    <hr/>
-</center>
+{% block header_buttons %}
+{% if user.is_authenticated %}
+<form action="/create_card" method="GET" style="padding-bottom: 20px;">
+    <button value="create" type="submit" class="btn btn-primary">
+        <span class="glyphicon glyphicon-plus"></span> &nbsp; Create Card
+    </button>
+</form>
+{% endif %}
+{% endblock %}
 
-  <!-- COLUNAS -->
-  <div class="container">
+{% block content %}
+<!-- COLUNAS -->
+<div class="container">
     {% for chave_column, dados_column in columns.items %}
     <div class="column" data-column="{{ chave_column }}">
-      <h3>{{ dados_column.name }}</h3>
-      <div class="cards-container">
-        {% for card in dados_column.cards %}
-        <div class="card" draggable="true" data-card-id="{{ card.id }}">
-    <div class="card-title">{{ card.title }}</div>
-    <hr>
-    
-    <div class="due-date-info">
-        <div>📅 Created: {{ card.created_in|date:"d/m/Y" }}</div>
-        {% if card.due_date %}
-        <div>⏰ Due Date: {{ card.due_date|date:"d/m/Y" }}</div>
-        <div>Status: 
-            {% if card.due_date < today %}
-                <span style="color:red">⚠️ Late</span>
-            {% else %}
-                <span style="color:green">✅ On Time</span>
-            {% endif %}
+        <h3>{{ dados_column.name }}</h3>
+        <div class="cards-container">
+            {% for card in dados_column.cards %}
+            <div class="card" draggable="true" data-card-id="{{ card.id }}">
+                <div class="card-title">{{ card.title }}</div>
+                <hr>
+                
+                <div class="due-date-info">
+                    <div>📅 Created: {{ card.created_in|date:"d/m/Y" }}</div>
+                    {% if card.due_date %}
+                    <div>⏰ Due Date: {{ card.due_date|date:"d/m/Y" }}</div>
+                    <div>Status: 
+                        {% if card.due_date < today %}
+                            <span style="color:red">⚠️ Late</span>
+                        {% else %}
+                            <span style="color:green">✅ On Time</span>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <div>⏰ Due Date: <span style="color: #999;">No due date</span></div>
+                    {% endif %}
+                </div>
+                
+                <hr>
+                <div class="card-details">{{ card.details|truncatewords:15 }}</div>
+
+                <div class="card-buttons">
+                    <form action="{% url 'edit_card' card.id %}" method="GET">
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            <span class="glyphicon glyphicon-edit"></span> Edit
+                        </button>
+                    </form>
+
+                    <form action="{% url 'del' card.id %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            <span class="glyphicon glyphicon-trash"></span> Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
         </div>
-        {% else %}
-        <div>⏰ Due Date: <span style="color: #999;">No due date</span></div>
-        {% endif %}
     </div>
-    
-    <hr>
-    <div class="card-details">{{ card.details|truncatewords:15 }}</div>
-
-    <div class="card-buttons">
-        <form action="{% url 'edit_card' card.id %}" method="GET">
-            <button type="submit" class="btn btn-primary btn-sm">
-                <span class="glyphicon glyphicon-edit"></span> Edit
-            </button>
-        </form>
-
-        <form action="{% url 'del' card.id %}" method="POST">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger btn-sm">
-                <span class="glyphicon glyphicon-trash"></span> Delete
-            </button>
-        </form>
-    </div>
-    </div>
-        {% endfor %}
-      </div>
-      </div>
     {% endfor %}
-  </div>
+</div>
+{% endblock %}
 
-  <script src="../../static/script.js"></script>
-</body>
-</html>
+{% block scripts %}
+<script src="../../static/script.js"></script>
+{% endblock %}

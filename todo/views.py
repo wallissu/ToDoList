@@ -55,14 +55,14 @@ def register(request):
             user = form.save()
             login(request, user)
             messages.success(request, 'Registration successful!')
-            return redirect('todo')  # Redirect to index after registration
+            return redirect('todo')
     else:
         form = CustomUserCreationForm()
-    return render(request, 'todo/register.html', {'form': form})
+    return render(request, 'todo/auth_page.html', {'form': form, 'title': 'Register'})
 
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect('todo')  # Redirect to index if already logged in
+        return redirect('todo')
         
     if request.method == 'POST':
         username = request.POST['username']
@@ -71,15 +71,16 @@ def login_view(request):
         if user is not None:
             login(request, user)
             messages.success(request, f'Welcome back, {username}!')
-            return redirect('todo')  # Redirect to index after login
+            return redirect('todo')
         else:
             messages.error(request, 'Invalid username or password')
-    return render(request, 'todo/login.html')
+    
+    return render(request, 'todo/auth_page.html', {'title': 'Login'})
+
 
 @login_required
 def profile(request):
-    # Optional: you can keep this view but add a link to go to index
-    return render(request, 'todo/profile.html')
+    return render(request, 'todo/profile.html', {'title': 'Profile'})
 
 def logout_view(request):
     logout(request)
@@ -112,7 +113,7 @@ def create(request):
             return redirect('todo')
     else:
         form = TodoForm()
-    return render(request, 'todo/create_card.html', {'form': form})
+    return render(request, 'todo/form_page.html', {'form': form, 'title': 'Create Card'})
 
 @login_required
 def edit_card(request, id):
@@ -120,14 +121,11 @@ def edit_card(request, id):
     if request.method == 'POST':
         form = TodoForm(request.POST, instance=todo)
         if form.is_valid():
-            edited_todo = form.save(commit=False)
-            edited_todo.user = request.user  # Ensure user is preserved
-            edited_todo.save()
-            messages.success(request, 'Task updated successfully!')
+            form.save()
             return redirect('todo')
     else:
         form = TodoForm(instance=todo)
-    return render(request, 'todo/edit_card.html', {'form': form})
+    return render(request, 'todo/form_page.html', {'form': form, 'title': 'Edit Card'})
 
 @csrf_exempt
 @require_POST

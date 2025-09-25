@@ -1,34 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" type='text/css' href="../../static/style.css">
-</head>
-<body>
-    <center class="row">
-        <h1><i>Profile</i></h1>
-        <hr>
-    </center>
-    
-    <center>
-        <div class="submit_form">
-            <h3>Welcome, {{ user.username }}!</h3>
-            <p>Email: {{ user.email }}</p>
-            <p>Joined: {{ user.date_joined|date:"F d, Y" }}</p>
-            
-            <div style="margin-top: 20px;">
-                <a href="{% url 'todo' %}" class="btn btn-primary btn-lg">
-                    <span class="glyphicon glyphicon-tasks"></span> Go to Trellado
-                </a>
-                <form action="{% url 'logout' %}" method="POST" style="display: inline; margin-left: 10px;">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger btn-lg">Logout</button>
-                </form>
-            </div>
+{% extends "todo/base.html" %}
+
+{% block title %}Profile{% endblock %}
+{% block page_title %}Profile{% endblock %}
+
+{% block header_content %}
+<div style="margin-bottom: 15px;">
+    <span>Welcome, <strong>{{ user.username }}</strong>!</span>
+    <a href="{% url 'todo' %}" class="btn btn-primary btn-sm" style="margin-left: 10px;">
+        <span class="glyphicon glyphicon-tasks"></span> Back to Board
+    </a>
+    <form action="{% url 'logout' %}" method="POST" style="display: inline; margin-left: 10px;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-warning btn-sm">
+            <span class="glyphicon glyphicon-log-out"></span> Logout
+        </button>
+    </form>
+</div>
+{% endblock %}
+
+{% block content %}
+<center>
+    <div class="submit_form">
+        <h3>Your Profile</h3>
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Joined:</strong> {{ user.date_joined|date:"F d, Y" }}</p>
+        
+        <div style="margin-top: 20px;">
+            <a href="{% url 'todo' %}" class="btn btn-primary btn-lg">
+                <span class="glyphicon glyphicon-tasks"></span> Go to Trellado
+            </a>
         </div>
-    </center>
-</body>
-</html>
+    </div>
+</center>
+{% endblock %}

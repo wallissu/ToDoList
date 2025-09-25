@@ -1,0 +1,38 @@
+{% extends "todo/base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block header_content %}
+{% endblock %}
+
+{% block content %}
+<center>
+    <div class="submit_form">
+        {% if form %}
+            <!-- Register Page -->
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <input type="submit" class="btn btn-success" value="Register" />
+            </form>
+            <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+        {% else %}
+            <!-- Login Page -->
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <input type="text" name="username" class="form-control" placeholder="Username" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" name="password" class="form-control" placeholder="Password" required>
+                </div>
+                <input type="submit" class="btn btn-primary" value="Login" />
+            </form>
+            <p>Don't have an account? <a href="{% url 'register' %}">Register here</a></p>
+        {% endif %}
+        <br>
+        <a href="{% url 'todo' %}">Back to Home</a>
+    </div>
+</center>
+{% endblock %}

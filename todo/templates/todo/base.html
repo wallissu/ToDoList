@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Trellado{% endblock %}</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type='text/css' href="../../static/style.css">
+</head>
+<body>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                <strong>{{ message }}</strong>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <center class="row">
+        <h1><i>{% block page_title %}Trellado{% endblock %}</i></h1>
+        
+        {% block header_content %}
+        {% if user.is_authenticated %}
+        <div align="right" style="margin-bottom: 15px;">
+            <span>Welcome, <strong>{{ user.username }}</strong>!</span>
+            <a href="{% url 'profile' %}" class="btn btn-info btn-sm" style="margin-left: 10px;">
+                <span class="glyphicon glyphicon-user"></span> Profile
+            </a>
+            <form action="{% url 'logout' %}" method="POST" style="display: inline; margin-left: 10px;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-warning btn-sm">
+                    <span class="glyphicon glyphicon-log-out"></span> Logout
+                </button>
+            </form>
+        </div>
+        {% else %}
+        <div style="margin-bottom: 15px;">
+            <p>Please log in to manage your cards</p>
+            <a href="{% url 'login' %}" class="btn btn-primary btn-sm">Login</a>
+            <a href="{% url 'register' %}" class="btn btn-success btn-sm">Register</a>
+        </div>
+        {% endif %}
+        {% endblock %}
+        
+        {% block header_buttons %}{% endblock %}
+        
+        <hr>
+    </center>
+
+    {% block content %}{% endblock %}
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
